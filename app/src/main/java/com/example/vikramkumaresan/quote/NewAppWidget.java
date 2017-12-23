@@ -2,11 +2,13 @@ package com.example.vikramkumaresan.quote;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,8 +43,10 @@ public class NewAppWidget extends AppWidgetProvider {
                             appWidgetManager.updateAppWidget(appWidgetId, views);
 
                             jobSchedulingUtil.scheduleJob(context,calcNextCallTime());
+                            Toast.makeText(context,"Quote Updated!",Toast.LENGTH_SHORT).show();
 
                         } catch (JSONException e) {
+                            Toast.makeText(context,"Server Error...",Toast.LENGTH_SHORT).show();
                             Log.d("test","JSONException");
                         }
                     }
@@ -50,6 +54,7 @@ public class NewAppWidget extends AppWidgetProvider {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(context,"Quote Unavailable-Device Offline",Toast.LENGTH_SHORT).show();
                         Log.d("test","Error = "+error.toString());
                         jobSchedulingUtil.scheduleJob(context,300000);
                     }
@@ -61,7 +66,7 @@ public class NewAppWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         //BOOT_COMPLETE or WidgetUpdate => Update widget!
-        onUpdate(context,AppWidgetManager.getInstance(context),intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS));
+        onUpdate(context,AppWidgetManager.getInstance(context),AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context.getPackageName(),NewAppWidget.class.getName())));
     }
 
    @Override
